@@ -4,219 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SlideSelect</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: #0f0f13;
-      color: #e8e6e0;
-      font-family: 'DM Mono', 'Courier New', monospace;
-      min-height: 100vh;
-    }
-
-    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Syne:wght@700;800&display=swap');
-
-    .header {
-      padding: 18px 32px;
-      border-bottom: 1px solid #1e1e2a;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      background: #0f0f13ee;
-      backdrop-filter: blur(10px);
-      z-index: 100;
-    }
-
-    .logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      color: #e8e6e0;
-      letter-spacing: -0.5px;
-    }
-
+    body { background: #0f0f13; color: #e8e6e0; font-family: 'DM Mono', 'Courier New', monospace; min-height: 100vh; }
+    .header { padding: 18px 32px; border-bottom: 1px solid #1e1e2a; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #0f0f13ee; backdrop-filter: blur(10px); z-index: 100; }
+    .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: #e8e6e0; letter-spacing: -0.5px; }
     .logo span { color: #5b8fff; }
-
-    .badge {
-      font-size: 12px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      background: #1a2e1a;
-      color: #4caf50;
-      display: none;
-    }
-
+    .badge { font-size: 12px; padding: 5px 14px; border-radius: 20px; background: #1a2e1a; color: #4caf50; display: none; }
     .main { max-width: 1400px; margin: 0 auto; padding: 32px; }
-
-    .card {
-      background: #13131c;
-      border: 1px solid #1e1e2a;
-      border-radius: 14px;
-      padding: 40px;
-      max-width: 500px;
-      margin: 60px auto;
-    }
-
-    .card-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: #e8e6e0;
-    }
-
-    .card-sub {
-      font-size: 13px;
-      color: #666;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
-
-    label {
-      font-size: 11px;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      background: #0a0a0e;
-      border: 1px solid #2a2a3a;
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: #e8e6e0;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      outline: none;
-      margin-bottom: 16px;
-      transition: border-color 0.15s;
-    }
-
+    .card { background: #13131c; border: 1px solid #1e1e2a; border-radius: 14px; padding: 40px; max-width: 500px; margin: 60px auto; }
+    .card-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; margin-bottom: 8px; color: #e8e6e0; }
+    .card-sub { font-size: 13px; color: #666; line-height: 1.7; margin-bottom: 28px; }
+    label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
+    input[type="text"] { width: 100%; background: #0a0a0e; border: 1px solid #2a2a3a; border-radius: 8px; padding: 12px 16px; color: #e8e6e0; font-family: 'DM Mono', monospace; font-size: 13px; outline: none; margin-bottom: 16px; transition: border-color 0.15s; }
     input[type="text"]:focus { border-color: #5b8fff; }
-
-    button {
-      width: 100%;
-      padding: 13px;
-      background: #5b8fff;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-family: 'DM Mono', monospace;
-      font-size: 13px;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-    }
-
+    button { width: 100%; padding: 13px; background: #5b8fff; color: #fff; border: none; border-radius: 8px; font-family: 'DM Mono', monospace; font-size: 13px; cursor: pointer; transition: background 0.15s, transform 0.1s; }
     button:hover { background: #4a7aee; transform: translateY(-1px); }
     button:disabled { background: #2a2a3a; color: #444; cursor: not-allowed; transform: none; }
-
-    .msg {
-      font-size: 12px;
-      color: #666;
-      margin-top: 12px;
-      text-align: center;
-      line-height: 1.6;
-    }
-
+    .msg { font-size: 12px; color: #666; margin-top: 12px; text-align: center; line-height: 1.6; }
     .msg.error { color: #e57373; }
-
-    .status-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-      padding: 14px 18px;
-      background: #13131c;
-      border: 1px solid #1e1e2a;
-      border-radius: 10px;
-    }
-
+    .status-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding: 14px 18px; background: #13131c; border: 1px solid #1e1e2a; border-radius: 10px; }
     .status-text { font-size: 13px; color: #888; }
     .counter { font-size: 16px; font-weight: 500; color: #5b8fff; font-family: 'Syne', sans-serif; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-    }
-
-    .slide-card {
-      background: #13131c;
-      border: 1px solid #1e1e2a;
-      border-radius: 12px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: border-color 0.15s, transform 0.15s, opacity 0.2s;
-      position: relative;
-    }
-
-    .slide-card:hover:not(.bewaard):not(.bezig) {
-      border-color: #5b8fff;
-      transform: translateY(-2px);
-    }
-
-    .slide-card.bewaard { opacity: 0.35; border-color: #2a4a2a; cursor: default; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .slide-card { background: #13131c; border: 1px solid #1e1e2a; border-radius: 12px; overflow: hidden; cursor: pointer; transition: border-color 0.15s, transform 0.15s, opacity 0.2s; position: relative; }
+    .slide-card:hover:not(.bewaard):not(.bezig) { border-color: #5b8fff; transform: translateY(-2px); }
+    .slide-card.bewaard { opacity: 0.5; border-color: #2a4a2a; }
+    .slide-card.bewaard:hover { border-color: #c0392b; opacity: 0.75; transform: translateY(-2px); }
     .slide-card.bezig { opacity: 0.6; cursor: wait; }
-
-    .slide-card img {
-      width: 100%;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-      display: block;
-      background: #0a0a0e;
-    }
-
-    .slide-footer {
-      padding: 9px 13px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .slide-name {
-      font-size: 11px;
-      color: #555;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 160px;
-    }
-
-    .slide-tag {
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background: #1a2e1a;
-      color: #4caf50;
-    }
-
-    .check-mark {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      background: #4caf50;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .empty {
-      text-align: center;
-      padding: 80px 20px;
-      color: #444;
-      font-size: 14px;
-    }
+    .slide-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #0a0a0e; }
+    .slide-footer { padding: 9px 13px; display: flex; align-items: center; justify-content: space-between; }
+    .slide-name { font-size: 11px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+    .slide-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #1a2e1a; color: #4caf50; }
+    .check-mark { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border-radius: 50%; background: #4caf50; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; pointer-events: none; transition: background 0.15s; }
+    .slide-card.bewaard:hover .check-mark { background: #c0392b; }
+    .undo-overlay { position: absolute; inset: 0; background: rgba(180, 30, 30, 0.12); display: none; align-items: center; justify-content: center; font-size: 13px; color: #e57373; pointer-events: none; letter-spacing: 0.5px; }
+    .slide-card.bewaard:hover .undo-overlay { display: flex; }
+    .empty { text-align: center; padding: 80px 20px; color: #444; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -259,8 +84,7 @@
   const API_KEY = "AIzaSyBDCXr_Qpc5dng_yVnkESa8-CTe9rAL6Uw";
   const SCOPES = "https://www.googleapis.com/auth/drive";
 
-  let gapiReady = false, gisReady = false;
-  let tokenClient = null;
+  let gapiReady = false, gisReady = false, tokenClient = null;
   let folderId = "", bewarenFolderId = null;
   let bewaard = {}, aantalBewaard = 0, totalSlides = 0;
 
@@ -301,7 +125,6 @@
 
   function handleSignIn() {
     document.getElementById("auth-msg").textContent = "Bezig met aanmelden...";
-    document.getElementById("auth-msg").className = "msg";
     tokenClient.requestAccessToken();
   }
 
@@ -370,27 +193,34 @@
       const thumb = file.thumbnailLink ? file.thumbnailLink.replace("=s220", "=s640") : "";
       card.innerHTML = `
         <img src="${thumb}" alt="${file.name}" loading="lazy" />
+        <div class="undo-overlay">↩ ongedaan maken</div>
         <div class="slide-footer">
           <span class="slide-name">${file.name}</span>
         </div>`;
-      card.onclick = () => bewaarSlide(file, card);
+      card.onclick = () => handleCardClick(file, card);
       grid.appendChild(card);
     });
   }
 
   function updateStatus() {
-    document.getElementById("status-text").textContent = totalSlides + " slides — klik om te bewaren";
+    document.getElementById("status-text").textContent = totalSlides + " slides — klik om te bewaren, nogmaals om ongedaan te maken";
     document.getElementById("counter").textContent = aantalBewaard + " / " + totalSlides;
     const badge = document.getElementById("badge");
     badge.textContent = aantalBewaard + " bewaard";
     badge.style.display = aantalBewaard > 0 ? "block" : "none";
   }
 
-  async function bewaarSlide(file, card) {
-    if (bewaard[file.id]) return;
-    bewaard[file.id] = true;
-    card.classList.add("bezig");
+  async function handleCardClick(file, card) {
+    if (card.classList.contains("bezig")) return;
+    if (bewaard[file.id]) {
+      await maakOngedaan(file, card);
+    } else {
+      await bewaarSlide(file, card);
+    }
+  }
 
+  async function bewaarSlide(file, card) {
+    card.classList.add("bezig");
     try {
       await gapi.client.drive.files.update({
         fileId: file.id,
@@ -398,16 +228,48 @@
         removeParents: folderId,
         fields: "id,parents"
       });
+      bewaard[file.id] = true;
       card.classList.remove("bezig");
       card.classList.add("bewaard");
-      card.innerHTML += `<div class="check-mark">✓</div>`;
-      card.querySelector(".slide-footer").innerHTML += `<span class="slide-tag">bewaard</span>`;
+      const check = document.createElement("div");
+      check.className = "check-mark";
+      check.id = "check-" + file.id;
+      check.textContent = "✓";
+      card.appendChild(check);
+      const tag = document.createElement("span");
+      tag.className = "slide-tag";
+      tag.id = "tag-" + file.id;
+      tag.textContent = "bewaard";
+      card.querySelector(".slide-footer").appendChild(tag);
       aantalBewaard++;
       updateStatus();
     } catch (e) {
-      bewaard[file.id] = false;
       card.classList.remove("bezig");
       alert("Fout bij bewaren: " + (e.result?.error?.message || e));
+    }
+  }
+
+  async function maakOngedaan(file, card) {
+    card.classList.add("bezig");
+    try {
+      await gapi.client.drive.files.update({
+        fileId: file.id,
+        addParents: folderId,
+        removeParents: bewarenFolderId,
+        fields: "id,parents"
+      });
+      bewaard[file.id] = false;
+      card.classList.remove("bezig");
+      card.classList.remove("bewaard");
+      const check = document.getElementById("check-" + file.id);
+      if (check) check.remove();
+      const tag = document.getElementById("tag-" + file.id);
+      if (tag) tag.remove();
+      aantalBewaard--;
+      updateStatus();
+    } catch (e) {
+      card.classList.remove("bezig");
+      alert("Fout bij ongedaan maken: " + (e.result?.error?.message || e));
     }
   }
 </script>
