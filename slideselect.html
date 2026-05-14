@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SlideSelect</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f13;
+      color: #e8e6e0;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      min-height: 100vh;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Syne:wght@700;800&display=swap');
+
+    .header {
+      padding: 18px 32px;
+      border-bottom: 1px solid #1e1e2a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: #0f0f13ee;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #e8e6e0;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: #5b8fff; }
+
+    .badge {
+      font-size: 12px;
+      padding: 5px 14px;
+      border-radius: 20px;
+      background: #1a2e1a;
+      color: #4caf50;
+      display: none;
+    }
+
+    .main { max-width: 1400px; margin: 0 auto; padding: 32px; }
+
+    .card {
+      background: #13131c;
+      border: 1px solid #1e1e2a;
+      border-radius: 14px;
+      padding: 40px;
+      max-width: 500px;
+      margin: 60px auto;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #e8e6e0;
+    }
+
+    .card-sub {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    label {
+      font-size: 11px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: #0a0a0e;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #e8e6e0;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 16px;
+      transition: border-color 0.15s;
+    }
+
+    input[type="text"]:focus { border-color: #5b8fff; }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: #5b8fff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    button:hover { background: #4a7aee; transform: translateY(-1px); }
+    button:disabled { background: #2a2a3a; color: #444; cursor: not-allowed; transform: none; }
+
+    .msg {
+      font-size: 12px;
+      color: #666;
+      margin-top: 12px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .msg.error { color: #e57373; }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 14px 18px;
+      background: #13131c;
+      border: 1px solid #1e1e2a;
+      border-radius: 10px;
+    }
+
+    .status-text { font-size: 13px; color: #888; }
+    .counter { font-size: 16px; font-weight: 500; color: #5b8fff; font-family: 'Syne', sans-serif; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .slide-card {
+      background: #13131c;
+      border: 1px solid #1e1e2a;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s, opacity 0.2s;
+      position: relative;
+    }
+
+    .slide-card:hover:not(.bewaard):not(.bezig) {
+      border-color: #5b8fff;
+      transform: translateY(-2px);
+    }
+
+    .slide-card.bewaard { opacity: 0.35; border-color: #2a4a2a; cursor: default; }
+    .slide-card.bezig { opacity: 0.6; cursor: wait; }
+
+    .slide-card img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      background: #0a0a0e;
+    }
+
+    .slide-footer {
+      padding: 9px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .slide-name {
+      font-size: 11px;
+      color: #555;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #1a2e1a;
+      color: #4caf50;
+    }
+
+    .check-mark {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #4caf50;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 80px 20px;
+      color: #444;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">slide<span>select</span></div>
+  <div class="badge" id="badge"></div>
+</div>
+
+<div class="main">
+  <div class="card" id="signin-panel">
+    <div class="card-title">Aanmelden</div>
+    <div class="card-sub">Meld je aan met het Google-account waarmee je toegang hebt tot de gedeelde map.</div>
+    <button id="signin-btn" onclick="handleSignIn()" disabled>Laden...</button>
+    <div class="msg" id="auth-msg"></div>
+  </div>
+
+  <div class="card" id="folder-panel" style="display:none">
+    <div class="card-title">Map instellen</div>
+    <div class="card-sub">Plak de Google Drive map-link of het map-ID hieronder.</div>
+    <label>Drive map-link of ID</label>
+    <input type="text" id="folder-input" placeholder="https://drive.google.com/drive/folders/..." />
+    <button onclick="loadSlides()">Slides laden</button>
+    <div class="msg" id="folder-msg"></div>
+  </div>
+
+  <div id="viewer-panel" style="display:none">
+    <div class="status-bar">
+      <div class="status-text" id="status-text"></div>
+      <div class="counter" id="counter"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<script src="https://apis.google.com/js/api.js"></script>
+<script src="https://accounts.google.com/gsi/client"></script>
+<script>
+  const CLIENT_ID = "993090842015-6afrrtcokifkt1psr9jo7gk7q18of571.apps.googleusercontent.com";
+  const API_KEY = "AIzaSyBDCXr_Qpc5dng_yVnkESa8-CTe9rAL6Uw";
+  const SCOPES = "https://www.googleapis.com/auth/drive";
+
+  let gapiReady = false, gisReady = false;
+  let tokenClient = null;
+  let folderId = "", bewarenFolderId = null;
+  let bewaard = {}, aantalBewaard = 0, totalSlides = 0;
+
+  window.onload = () => {
+    gapi.load("client", async () => {
+      await gapi.client.init({
+        apiKey: API_KEY,
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+      });
+      gapiReady = true;
+      tryEnableSignIn();
+    });
+
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPES,
+      callback: (resp) => {
+        if (resp.error) {
+          document.getElementById("auth-msg").textContent = "Aanmelden mislukt: " + resp.error;
+          document.getElementById("auth-msg").className = "msg error";
+          return;
+        }
+        document.getElementById("signin-panel").style.display = "none";
+        document.getElementById("folder-panel").style.display = "block";
+      }
+    });
+    gisReady = true;
+    tryEnableSignIn();
+  };
+
+  function tryEnableSignIn() {
+    if (gapiReady && gisReady) {
+      const btn = document.getElementById("signin-btn");
+      btn.textContent = "Aanmelden met Google";
+      btn.disabled = false;
+    }
+  }
+
+  function handleSignIn() {
+    document.getElementById("auth-msg").textContent = "Bezig met aanmelden...";
+    document.getElementById("auth-msg").className = "msg";
+    tokenClient.requestAccessToken();
+  }
+
+  function extractId(input) {
+    const m = input.match(/folders\/([a-zA-Z0-9_-]+)/);
+    return m ? m[1] : input.trim();
+  }
+
+  async function loadSlides() {
+    const input = document.getElementById("folder-input").value.trim();
+    if (!input) return;
+    folderId = extractId(input);
+    const msg = document.getElementById("folder-msg");
+    msg.textContent = "Slides laden...";
+    msg.className = "msg";
+
+    try {
+      const res = await gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and mimeType='image/png' and trashed=false`,
+        fields: "files(id,name,thumbnailLink)",
+        orderBy: "name",
+        pageSize: 1000
+      });
+      const slides = res.result.files || [];
+      totalSlides = slides.length;
+
+      const fr = await gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder' and name='bewaren' and trashed=false`,
+        fields: "files(id)"
+      });
+
+      if (fr.result.files.length > 0) {
+        bewarenFolderId = fr.result.files[0].id;
+      } else {
+        const nf = await gapi.client.drive.files.create({
+          resource: { name: "bewaren", mimeType: "application/vnd.google-apps.folder", parents: [folderId] },
+          fields: "id"
+        });
+        bewarenFolderId = nf.result.id;
+      }
+
+      document.getElementById("folder-panel").style.display = "none";
+      document.getElementById("viewer-panel").style.display = "block";
+      renderSlides(slides);
+
+    } catch (e) {
+      msg.textContent = "Fout: controleer de map-ID en of de map gedeeld is. " + (e.result?.error?.message || "");
+      msg.className = "msg error";
+    }
+  }
+
+  function renderSlides(slides) {
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+    updateStatus();
+
+    if (slides.length === 0) {
+      grid.innerHTML = '<div class="empty">Geen PNG slides gevonden in deze map.</div>';
+      return;
+    }
+
+    slides.forEach(file => {
+      const card = document.createElement("div");
+      card.className = "slide-card";
+      card.id = "card-" + file.id;
+      const thumb = file.thumbnailLink ? file.thumbnailLink.replace("=s220", "=s640") : "";
+      card.innerHTML = `
+        <img src="${thumb}" alt="${file.name}" loading="lazy" />
+        <div class="slide-footer">
+          <span class="slide-name">${file.name}</span>
+        </div>`;
+      card.onclick = () => bewaarSlide(file, card);
+      grid.appendChild(card);
+    });
+  }
+
+  function updateStatus() {
+    document.getElementById("status-text").textContent = totalSlides + " slides — klik om te bewaren";
+    document.getElementById("counter").textContent = aantalBewaard + " / " + totalSlides;
+    const badge = document.getElementById("badge");
+    badge.textContent = aantalBewaard + " bewaard";
+    badge.style.display = aantalBewaard > 0 ? "block" : "none";
+  }
+
+  async function bewaarSlide(file, card) {
+    if (bewaard[file.id]) return;
+    bewaard[file.id] = true;
+    card.classList.add("bezig");
+
+    try {
+      await gapi.client.drive.files.update({
+        fileId: file.id,
+        addParents: bewarenFolderId,
+        removeParents: folderId,
+        fields: "id,parents"
+      });
+      card.classList.remove("bezig");
+      card.classList.add("bewaard");
+      card.innerHTML += `<div class="check-mark">✓</div>`;
+      card.querySelector(".slide-footer").innerHTML += `<span class="slide-tag">bewaard</span>`;
+      aantalBewaard++;
+      updateStatus();
+    } catch (e) {
+      bewaard[file.id] = false;
+      card.classList.remove("bezig");
+      alert("Fout bij bewaren: " + (e.result?.error?.message || e));
+    }
+  }
+</script>
+</body>
+</html>
