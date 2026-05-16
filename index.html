@@ -142,8 +142,9 @@
     msg.className = "msg";
 
     try {
+      // Query aangepast om zowel PNG als JPEG te ondersteunen
       const res = await gapi.client.drive.files.list({
-        q: `'${folderId}' in parents and mimeType='image/png' and trashed=false`,
+        q: `'${folderId}' in parents and (mimeType='image/png' or mimeType='image/jpeg') and trashed=false`,
         fields: "files(id,name,thumbnailLink)",
         orderBy: "name",
         pageSize: 1000
@@ -182,7 +183,7 @@
     updateStatus();
 
     if (slides.length === 0) {
-      grid.innerHTML = '<div class="empty">Geen PNG slides gevonden in deze map.</div>';
+      grid.innerHTML = '<div class="empty">Geen afbeeldingen (PNG/JPG) gevonden in deze map.</div>';
       return;
     }
 
